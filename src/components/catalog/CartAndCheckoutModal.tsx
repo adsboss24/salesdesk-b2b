@@ -181,42 +181,42 @@ export function CartAndCheckoutModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/70 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200">
-      <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-slate-950/70 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200">
+      <div className="bg-white w-full max-w-4xl rounded-xl sm:rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[96vh] sm:max-h-[92vh]">
         
         {/* Modal Top Header */}
-        <div className="p-5 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-amber-600 flex items-center justify-center font-bold text-white shadow-sm">
-              <Receipt className="w-5 h-5" />
+        <div className="p-3.5 sm:p-5 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-amber-600 flex items-center justify-center font-bold text-white shadow-sm shrink-0">
+              <Receipt className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <div>
-              <h3 className="font-bold text-base sm:text-lg">
+            <div className="min-w-0">
+              <h3 className="font-bold text-sm sm:text-lg truncate">
                 {activeTab === 'cart' && 'รายการสินค้า B2B ที่เลือก (B2B Cart)'}
                 {activeTab === 'quote_form' && 'ออกใบเสนอราคาทางการ (Instant Quotation PDF)'}
                 {activeTab === 'transfer_form' && 'ชำระเงินโอนธนาคารนิติบุคคล & แนบสลิป'}
               </h3>
-              <p className="text-xs text-slate-400">
-                {cart.length} รายการ | ผู้ขาย: {supplier.companyName}
+              <p className="text-[10px] sm:text-xs text-slate-400 truncate">
+                {cart.length} รายการ | {supplier.companyName}
               </p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition"
+            className="p-1.5 sm:p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition shrink-0 ml-2"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="bg-slate-100 border-b border-slate-200 px-5 flex gap-2 pt-2">
+        <div className="bg-slate-100 border-b border-slate-200 px-3 sm:px-5 flex gap-1.5 sm:gap-2 pt-2 overflow-x-auto scrollbar-none [&::-webkit-scrollbar]:hidden">
           <button
             onClick={() => setActiveTab('cart')}
-            className={`px-4 py-2 text-xs font-bold rounded-t-lg transition border-t border-x ${
+            className={`px-3 sm:px-4 py-2 text-xs font-bold rounded-t-lg transition border-t border-x shrink-0 whitespace-nowrap ${
               activeTab === 'cart'
-                ? 'bg-white border-slate-200 text-slate-900 shadow-sm'
+                ? 'bg-white border-slate-200 text-slate-900 shadow-xs'
                 : 'border-transparent text-slate-500 hover:text-slate-900'
             }`}
           >
@@ -225,9 +225,9 @@ export function CartAndCheckoutModal({
           <button
             onClick={() => cart.length > 0 && setActiveTab('quote_form')}
             disabled={cart.length === 0}
-            className={`px-4 py-2 text-xs font-bold rounded-t-lg transition border-t border-x flex items-center gap-1.5 ${
+            className={`px-3 sm:px-4 py-2 text-xs font-bold rounded-t-lg transition border-t border-x flex items-center gap-1.5 shrink-0 whitespace-nowrap ${
               activeTab === 'quote_form'
-                ? 'bg-white border-slate-200 text-amber-700 shadow-sm'
+                ? 'bg-white border-slate-200 text-amber-700 shadow-xs'
                 : 'border-transparent text-slate-500 hover:text-slate-900 disabled:opacity-40'
             }`}
           >
@@ -237,9 +237,9 @@ export function CartAndCheckoutModal({
           <button
             onClick={() => cart.length > 0 && setActiveTab('transfer_form')}
             disabled={cart.length === 0}
-            className={`px-4 py-2 text-xs font-bold rounded-t-lg transition border-t border-x flex items-center gap-1.5 ${
+            className={`px-3 sm:px-4 py-2 text-xs font-bold rounded-t-lg transition border-t border-x flex items-center gap-1.5 shrink-0 whitespace-nowrap ${
               activeTab === 'transfer_form'
-                ? 'bg-white border-slate-200 text-emerald-700 shadow-sm'
+                ? 'bg-white border-slate-200 text-emerald-700 shadow-xs'
                 : 'border-transparent text-slate-500 hover:text-slate-900 disabled:opacity-40'
             }`}
           >
@@ -249,7 +249,7 @@ export function CartAndCheckoutModal({
         </div>
 
         {/* Modal Body */}
-        <div className="p-6 overflow-y-auto flex-1 space-y-6">
+        <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-4 sm:space-y-6">
           {activeTab === 'cart' && (
             <div>
               {cart.length === 0 ? (
