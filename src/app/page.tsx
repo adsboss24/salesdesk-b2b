@@ -16,16 +16,14 @@ import {
 } from '@/lib/store';
 import { Navbar } from '@/components/ui/Navbar';
 import { ProductCard } from '@/components/catalog/ProductCard';
+import { ProductDetailModal } from '@/components/catalog/ProductDetailModal';
 import { CartAndCheckoutModal } from '@/components/catalog/CartAndCheckoutModal';
 import { QuotationDocument } from '@/components/quotation/QuotationDocument';
 import { AdminDashboard } from '@/components/admin/AdminDashboard';
 import {
   Search,
   FileText,
-  ShieldCheck,
-  TrendingDown,
   ShoppingBag,
-  Sparkles,
   ArrowRight
 } from 'lucide-react';
 
@@ -41,6 +39,7 @@ export default function HomePage() {
   const [activeView, setActiveView] = useState<'store' | 'admin' | 'quotation'>('store');
   const [selectedQuotation, setSelectedQuotation] = useState<Quotation | null>(null);
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
+  const [detailProduct, setDetailProduct] = useState<B2BProduct | null>(null);
 
   // Search & Filter state
   const [selectedCategory, setSelectedCategory] = useState<string>('ทั้งหมด');
@@ -157,10 +156,10 @@ export default function HomePage() {
 
   if (!mounted || !supplier) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-zinc-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-10 h-10 border-4 border-amber-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-          <p className="text-sm font-semibold text-slate-700">กำลังโหลดระบบ SalesDesk B2B...</p>
+          <div className="w-8 h-8 border-2 border-zinc-900 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+          <p className="text-xs text-zinc-500 font-medium">กำลังโหลด...</p>
         </div>
       </div>
     );
@@ -182,7 +181,7 @@ export default function HomePage() {
   const cartSubtotal = cart.reduce((acc, i) => acc + i.subtotal, 0);
 
   return (
-    <div className="min-h-screen bg-slate-50/60 text-slate-900 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#fafaf9] text-zinc-900 flex flex-col font-sans selection:bg-zinc-900 selection:text-white">
       {/* Global Navbar */}
       <Navbar
         supplier={supplier}
@@ -229,130 +228,62 @@ export default function HomePage() {
 
       {/* View 3: Storefront B2B Catalog */}
       {activeView === 'store' && (
-        <main className="flex-1 pb-36 sm:pb-28">
-          {/* Hero Banner */}
-          <section className="bg-slate-900 text-white relative overflow-hidden py-8 sm:py-12 px-4 sm:px-6 border-b border-slate-800">
-            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#d97706_1px,transparent_1px)] [background-size:16px_16px]"></div>
-            
-            <div className="max-w-7xl mx-auto relative z-10">
-              <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 sm:gap-8">
-                <div className="max-w-2xl space-y-3">
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[11px] sm:text-xs font-semibold">
-                    <Sparkles className="w-3.5 h-3.5 shrink-0" />
-                    B2B Fast-Commerce & Official Quotation Engine
-                  </div>
-                  <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight">
-                    ระบบสั่งซื้อราคาส่งหน้าโรงงาน & ออกใบเสนอราคาใน <span className="text-amber-400 underline decoration-amber-500/50">30 วินาที</span>
-                  </h1>
-                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                    หมดปัญหาแอดมินพิมพ์ Excel ข้ามวัน ลูกค้าฝ่ายจัดซื้อสามารถเลือกสเปกจริง คำนวณ Tier ส่วนลดอัตโนมัติ 
-                    และดาวน์โหลดใบเสนอราคามาตรฐานไทย (PDF) พร้อมข้อมูลภาษีครบถ้วนได้ทันที
-                  </p>
+        <main className="flex-1 pb-32">
+          {/* Minimalist Hero Section */}
+          <section className="pt-10 sm:pt-16 pb-8 px-4 sm:px-6 max-w-4xl mx-auto text-center">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-tight text-zinc-900">
+              แคตตาล็อกสินค้า & ออกใบเสนอราคา B2B
+            </h1>
+            <p className="text-xs sm:text-sm text-zinc-500 mt-2.5 max-w-md mx-auto leading-relaxed">
+              สั่งซื้อราคาส่งหน้าโรงงาน พร้อมระบบคำนวณภาษีและออกใบเสนอราคาทางการใน 30 วินาที
+            </p>
 
-                  {/* Highlights Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 pt-2 text-[11px] sm:text-xs font-medium text-slate-200">
-                    <div className="flex items-center gap-2">
-                      <TrendingDown className="w-4 h-4 text-amber-400 shrink-0" />
-                      <span>ราคาส่ง Tier Pricing หน้าโรงงาน</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-amber-400 shrink-0" />
-                      <span>ออกใบเสนอราคา PDF ทันที</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
-                      <span>ออกใบกำกับภาษีเต็มรูป 7%</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Fast Action Card */}
-                <div className="bg-white/10 backdrop-blur-md border border-white/15 p-4 sm:p-5 rounded-2xl w-full lg:w-96 text-xs space-y-2.5 shadow-xl">
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-white uppercase tracking-wider text-[10px] sm:text-[11px]">
-                      สถานะระบบ B2B วันนี้
-                    </span>
-                    <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold text-[9px] sm:text-[10px]">
-                      ออนไลน์ 24 ชม.
-                    </span>
-                  </div>
-                  <div className="space-y-1 text-slate-300 text-[11px] sm:text-xs">
-                    <div className="flex justify-between">
-                      <span>สินค้าพร้อมส่งล็อตใหญ่:</span>
-                      <span className="font-bold text-white font-mono">{products.length} รายการ</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>เงื่อนไขการจัดส่ง:</span>
-                      <span className="font-bold text-amber-300">ส่งฟรีเมื่อยอดเกิน 50,000.-</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>ความเร็วออกเอกสาร:</span>
-                      <span className="font-bold text-emerald-400">เฉลี่ย &lt; 30 วินาที</span>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => setIsCartModalOpen(true)}
-                    className="w-full mt-2 py-2 sm:py-2.5 bg-amber-600 hover:bg-amber-500 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-md transition"
-                  >
-                    <ShoppingBag className="w-4 h-4" />
-                    เปิดรายการคำนวณราคา ({cart.length} รายการ)
-                  </button>
-                </div>
-              </div>
+            {/* Clean Floating Search Bar */}
+            <div className="mt-6 max-w-md mx-auto relative">
+              <Search className="w-4 h-4 absolute left-3.5 top-3 text-zinc-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="ค้นหารายการสินค้า, สเปก หรือรหัส SKU..."
+                className="w-full pl-10 pr-4 py-2.5 bg-white border border-zinc-200/80 rounded-full text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 shadow-xs transition"
+              />
             </div>
-          </section>
 
-          {/* Search & Category Filter Section */}
-          <section className="max-w-7xl mx-auto px-3 sm:px-6 pt-5 sm:pt-8 pb-3">
-            <div className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3 bg-white p-3 sm:p-4 rounded-2xl border border-slate-200/80 shadow-xs">
-              {/* Category Pills with smooth horizontal scrolling */}
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none [&::-webkit-scrollbar]:hidden -mx-1 px-1">
-                {categories.map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0 ${
-                      selectedCategory === cat
-                        ? 'bg-slate-900 text-white shadow-xs'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
-
-              {/* Search Bar */}
-              <div className="relative w-full md:w-80 shrink-0">
-                <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="ค้นหาสินค้า สเปก หรือรหัส SKU..."
-                  className="w-full pl-9 pr-3 py-1.5 sm:py-2 border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-amber-600/30 focus:border-amber-600 bg-white"
-                />
-              </div>
+            {/* Category Pills */}
+            <div className="mt-5 flex items-center justify-center gap-1.5 overflow-x-auto pb-1 scrollbar-none [&::-webkit-scrollbar]:hidden">
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition whitespace-nowrap shrink-0 ${
+                    selectedCategory === cat
+                      ? 'bg-zinc-900 text-white shadow-xs'
+                      : 'bg-white text-zinc-600 hover:text-zinc-900 border border-zinc-200/60 hover:border-zinc-300'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
             </div>
           </section>
 
           {/* Product Catalog Grid */}
-          <section className="max-w-7xl mx-auto px-3 sm:px-6 py-3 sm:py-4">
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
             {filteredProducts.length === 0 ? (
-              <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center text-slate-400">
-                <Search className="w-10 h-10 mx-auto text-slate-300 mb-2" />
-                <p className="text-sm font-bold text-slate-600">ไม่พบสินค้าที่ตรงกับการค้นหา</p>
-                <p className="text-xs text-slate-400 mt-1">ลองเปลี่ยนคำค้นหา หรือเลือกหมวดหมู่อื่น</p>
+              <div className="bg-white rounded-2xl border border-zinc-200/80 p-12 text-center text-zinc-400">
+                <Search className="w-8 h-8 mx-auto text-zinc-300 mb-2" />
+                <p className="text-sm font-medium text-zinc-700">ไม่พบสินค้าที่ตรงกับการค้นหา</p>
+                <p className="text-xs text-zinc-400 mt-1">ลองเปลี่ยนคำค้นหา หรือเลือกหมวดหมู่อื่น</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredProducts.map((product) => (
                   <ProductCard
                     key={product.id}
                     product={product}
                     onAddToCart={handleAddToCart}
-                    onQuickQuote={() => setIsCartModalOpen(true)}
+                    onOpenDetail={(p) => setDetailProduct(p)}
                   />
                 ))}
               </div>
@@ -361,41 +292,40 @@ export default function HomePage() {
         </main>
       )}
 
-      {/* Floating Bottom Cart Bar (Sleek single-line mobile & desktop layout) */}
+      {/* Floating Bottom Cart Capsule */}
       {cart.length > 0 && activeView === 'store' && (
-        <div className="fixed bottom-3 sm:bottom-4 left-3 right-3 sm:left-4 sm:right-4 max-w-3xl mx-auto z-30 animate-in slide-in-from-bottom duration-300">
-          <div className="bg-slate-900/95 backdrop-blur-md text-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-2xl border border-slate-800 flex items-center justify-between gap-2 sm:gap-4">
-            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-amber-600 flex items-center justify-center font-bold text-white shadow shrink-0">
-                <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5" />
+        <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-30 w-full max-w-md px-4 animate-in slide-in-from-bottom duration-300">
+          <div className="bg-zinc-900/95 backdrop-blur-md text-white px-4 py-2.5 rounded-full shadow-2xl border border-zinc-800 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-7 h-7 rounded-full bg-zinc-800 flex items-center justify-center font-bold text-amber-400 shrink-0">
+                <ShoppingBag className="w-3.5 h-3.5" />
               </div>
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] text-slate-400">เลือก:</span>
-                  <span className="text-[10px] font-bold bg-amber-500/20 text-amber-300 px-1.5 py-0.2 rounded">
-                    {cart.length} รายการ
-                  </span>
-                </div>
-                <div className="text-xs sm:text-sm font-extrabold text-white mt-0.5 font-mono truncate">
-                  ฿<span className="text-amber-400 text-sm sm:text-base font-bold">{cartSubtotal.toLocaleString()}</span>
-                  <span className="text-[9px] text-slate-400 font-normal ml-1 hidden xs:inline">(ก่อน VAT)</span>
-                </div>
+              <div className="text-xs truncate">
+                <span className="font-semibold text-white">{cart.length} รายการ</span>
+                <span className="text-zinc-400 mx-1.5">·</span>
+                <span className="font-mono font-bold text-zinc-200">฿{cartSubtotal.toLocaleString()}</span>
               </div>
             </div>
 
-            <div className="flex items-center shrink-0">
-              <button
-                onClick={() => setIsCartModalOpen(true)}
-                className="px-3.5 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs rounded-lg sm:rounded-xl shadow-lg transition flex items-center gap-1.5 whitespace-nowrap"
-              >
-                <FileText className="w-3.5 h-3.5 shrink-0" />
-                <span>ออกใบเสนอราคา PDF</span>
-                <ArrowRight className="w-3 h-3 shrink-0" />
-              </button>
-            </div>
+            <button
+              onClick={() => setIsCartModalOpen(true)}
+              className="px-4 py-1.5 bg-white hover:bg-zinc-100 text-zinc-900 font-medium text-xs rounded-full shadow transition flex items-center gap-1.5 whitespace-nowrap shrink-0"
+            >
+              <FileText className="w-3.5 h-3.5" />
+              <span>ออกใบเสนอราคา</span>
+              <ArrowRight className="w-3 h-3" />
+            </button>
           </div>
         </div>
       )}
+
+      {/* Product Detail Modal */}
+      <ProductDetailModal
+        product={detailProduct}
+        isOpen={!!detailProduct}
+        onClose={() => setDetailProduct(null)}
+        onAddToCart={handleAddToCart}
+      />
 
       {/* Cart & Dual Checkout Modal */}
       <CartAndCheckoutModal
@@ -410,20 +340,15 @@ export default function HomePage() {
         onCreateOrder={handleCreateOrder}
       />
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-slate-200 py-6 sm:py-8 px-4 sm:px-6 text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
-          <div>
-            <span className="font-bold text-slate-800">SalesDesk B2B Platform</span> — Instant B2B Catalog & Quotation Engine
-            <p className="text-[11px] text-slate-400 mt-0.5">
-              {supplier.companyName} | เลขประจำตัวผู้เสียภาษี: {supplier.taxId}
-            </p>
-          </div>
-          <div className="flex items-center gap-3 text-slate-600 font-medium text-[11px]">
-            <span>มาตรฐานใบเสนอราคาไทย 100%</span>
-            <span>•</span>
-            <span>ความปลอดภัยระดับองค์กร</span>
-          </div>
+      {/* Minimal Footer */}
+      <footer className="bg-white border-t border-zinc-200/60 py-6 px-4 sm:px-6 text-xs text-zinc-400">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2 text-center sm:text-left">
+          <p className="font-medium text-zinc-600">
+            {supplier.companyName}
+          </p>
+          <p className="text-[11px]">
+            SalesDesk B2B Platform · มาตรฐานใบเสนอราคาและใบกำกับภาษีไทย
+          </p>
         </div>
       </footer>
     </div>
