@@ -4,6 +4,7 @@ import React, { useState, useRef } from 'react';
 import { B2BProduct, SupplierCompanyInfo, Quotation, Order } from '@/lib/types';
 import { exportCatalogTemplate, parseExcelCatalog } from '@/lib/excel-helper';
 import { INITIAL_PRODUCTS } from '@/lib/mock-data';
+import { ProductFormModal } from './ProductFormModal';
 import {
   FileSpreadsheet,
   Upload,
@@ -56,28 +57,23 @@ export function AdminDashboard({
   const [webhookMessage, setWebhookMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // New product form modal
+  // New / Edit product modal state
   const [isAddingProduct, setIsAddingProduct] = useState(false);
-  const [newProduct, setNewProduct] = useState<Partial<B2BProduct>>({
-    code: 'NEW-PKG-01',
-    name: '',
-    category: 'บรรจุภัณฑ์อุตสาหกรรม',
-    description: '',
-    unit: 'ชิ้น',
-    moq: 50,
-    basePrice: 100,
-    imageUrl: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=600&q=80',
-    specifications: { 'มาตรฐาน': 'ISO 9001' },
-    variants: [
-      { id: 'v1', name: 'สเปกมาตรฐาน', sku: 'NEW-PKG-01-STD', pricePerUnit: 100, minQuantity: 50, stockStatus: 'in_stock' }
-    ],
-    tierPricing: [
-      { minQty: 50, unitPrice: 100, discountPercent: 0 },
-      { minQty: 100, unitPrice: 90, discountPercent: 10 },
-      { minQty: 500, unitPrice: 80, discountPercent: 20 },
-    ],
-    inStock: true
-  });
+  const [editingProduct, setEditingProduct] = useState<B2BProduct | null>(null);
+
+  const handleSaveProduct = (product: B2BProduct) => {
+    if (editingProduct) {
+      const updated = products.map((p) => (p.id === product.id ? product : p));
+      onUpdateProducts(updated);
+      alert(`บันทึกการแก้ไขสินค้า ${product.name} เรียบร้อยแล้ว`);
+    } else {
+      onUpdateProducts([product, ...products]);
+      alert(`เพิ่มสินค้าใหม่ ${product.name} สำเร็จ!`);
+    }
+    setIsAddingProduct(false);
+    setEditingProduct(null);
+    setActiveTab('products');
+  };
 
   const handleExcelUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -152,7 +148,10 @@ export function AdminDashboard({
             นำเข้า Excel
           </button>
           <button
-            onClick={() => setIsAddingProduct(true)}
+            onClick={() => {
+              setEditingProduct(null);
+              setIsAddingProduct(true);
+            }}
             className="flex items-center gap-1.5 px-3.5 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold rounded-lg shadow transition"
           >
             <Plus className="w-4 h-4" />
@@ -415,8 +414,20 @@ export function AdminDashboard({
                 className="w-full pl-9 pr-3 py-1.5 border border-slate-300 rounded-lg text-xs"
               />
             </div>
-            <div className="text-xs text-slate-500">
-              สินค้าทั้งหมด <strong className="text-slate-900">{products.length}</strong> รายการ
+            <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+              <div className="text-xs text-slate-500">
+                สินค้าทั้งหมด <strong className="text-slate-900">{products.length}</strong> รายการ
+              </div>
+              <button
+                onClick={() => {
+                  setEditingProduct(null);
+                  setIsAddingProduct(true);
+                }}
+                className="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-xs transition"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                เพิ่มสินค้าใหม่
+              </button>
             </div>
           </div>
 
@@ -457,17 +468,29 @@ export function AdminDashboard({
                         </span>
                       </td>
                       <td className="p-3 text-center">
-                        <button
-                          onClick={() => {
-                            if (confirm(`คุณต้องการลบสินค้า ${p.name} หรือไม่?`)) {
-                              onUpdateProducts(products.filter(item => item.id !== p.id));
-                            }
-                          }}
-                          className="p-1 hover:bg-rose-50 text-rose-600 rounded transition"
-                          title="ลบสินค้า"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        <div className="flex items-center justify-center gap-1">
+                          <button
+                            onClick={() => {
+                              setEditingProduct(p);
+                              setIsAddingProduct(true);
+                            }}
+                            className="p-1 hover:bg-slate-100 text-slate-600 rounded transition"
+                            title="แก้ไขสินค้า"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (confirm(`คุณต้องการลบสินค้า ${p.name} หรือไม่?`)) {
+                                onUpdateProducts(products.filter(item => item.id !== p.id));
+                              }
+                            }}
+                            className="p-1 hover:bg-rose-50 text-rose-600 rounded transition"
+                            title="ลบสินค้า"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -778,6 +801,18 @@ export function AdminDashboard({
           </div>
         </div>
       )}
+
+      {/* Add / Edit Product Modal */}
+      <ProductFormModal
+        isOpen={isAddingProduct}
+        onClose={() => {
+          setIsAddingProduct(false);
+          setEditingProduct(null);
+        }}
+        onSave={handleSaveProduct}
+        initialProduct={editingProduct}
+        existingCategories={Array.from(new Set(products.map((p) => p.category)))}
+      />
     </div>
   );
 }
